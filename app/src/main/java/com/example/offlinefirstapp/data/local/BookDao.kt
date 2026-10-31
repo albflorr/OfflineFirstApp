@@ -21,7 +21,7 @@ interface BookDao {
     fun getFavoriteBooks():Flow<List<BookEntity>>
 
     @Query("SELECT * FROM books WHERE key = :key LIMIT 1")
-    fun getBookByKey(key:String): BookEntity?
+    suspend fun getBookByKey(key:String): BookEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBooks(books : List<BookEntity>)

@@ -3,8 +3,9 @@ package com.example.offlinefirstapp.data.repository
 import com.example.offlinefirstapp.data.local.BookDao
 import com.example.offlinefirstapp.data.local.BookEntity
 import com.example.offlinefirstapp.data.remote.OpenLibraryApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import retrofit2.http.Query
+import kotlinx.coroutines.withContext
 
 class BookRepository (
     private val bookDao: BookDao,
@@ -25,9 +26,9 @@ class BookRepository (
     }
 
     /* Obtener datos de OpenLibraryApi y los vamos a guardar en Room */
-    suspend fun refreshBooksFromApi(query: String){
+    suspend fun refreshBooksFromApi(query: String) = withContext(Dispatchers.IO) {
         val cleanQuery = query.trim()
-        if(cleanQuery.isEmpty()) return
+        if(cleanQuery.isEmpty()) return@withContext
 
         val response = api.searchBooks(cleanQuery)
         val currentTime = System.currentTimeMillis()
@@ -57,11 +58,9 @@ class BookRepository (
         }
     }
 
-    private fun String?.isNullOfBlank(): Boolean = this == null || this.isBlank()
-
     /* mantenimiento de estado isFavorite */
 
-    suspend fun toggleFavorite(key:String,currentStatus: Boolean){
+    suspend fun toggleFavorite(key:String,currentStatus: Boolean) = withContext(Dispatchers.IO) {
         bookDao.updateFavorite(key,!currentStatus)
     }
 
